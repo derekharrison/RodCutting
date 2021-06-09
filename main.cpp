@@ -30,7 +30,7 @@ int max(int a, int b) {
     return dum;
 }
 
-int func(int n, int A[]) {
+int max_rev(int n, int A[]) {
 
     num_calls++;
     curr_cut_index = n;
@@ -57,13 +57,13 @@ int func(int n, int A[]) {
                     dum1 = f_table[i]->val;
                 }
                 else {
-                    dum1 = func(i, A);
+                    dum1 = max_rev(i, A);
                 }
                 if(f_table[n-i]->is_set == true) {
                     dum2 = f_table[n-i]->val;
                 }
                 else {
-                    dum2 = func(n-i, A);
+                    dum2 = max_rev(n-i, A);
                 }
 
                 int dum = max(dum1 + dum2, A[n-1]);
@@ -87,7 +87,7 @@ void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
     int NN = n;
 
     while(NN > 0) {
-        (void) func(NN, A);
+        (void) max_rev(NN, A);
         r[curr_cut_index] = true;
         cut_counter[curr_cut_index]++;
         NN = NN - curr_cut_index;
@@ -96,7 +96,7 @@ void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
     //Check to see if optimal cut can be cut up further
     for(int i = 0; i < n + 1; ++i) {
         if(r[i] == true) {
-            int max_rev_loc = func(i, A);
+            int max_rev_loc = max_rev(i, A);
             if(max_rev_loc != A[i-1]) {
                 printf("error, cut not optimal\n");
             }
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
     }
 
     //Compute omptimum revenue
-    int rev = func(N, A);
+    int rev = max_rev(N, A);
 
     //Get optimum cut
     extract_optimum_cut(N, A, rod_cut_at, cut_counter);
