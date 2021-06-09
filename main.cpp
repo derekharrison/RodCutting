@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <vector>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct table_element {
     bool is_set = false;
@@ -84,6 +85,8 @@ int max_rev(int n, int A[]) {
 
 void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
 
+	(void) max_rev(n, A);
+
     int NN = n;
 
     while(NN > 0) {
@@ -111,6 +114,8 @@ int main(int argc, char* argv[]) {
 
     int *cut_counter = new int[N+1];
     curr_cut_index = N;
+
+    srand(time(NULL));
 
     //Initialize cost array with random numbers
     for(int i = 0; i < N; ++i) {
