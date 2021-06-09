@@ -30,41 +30,48 @@ int max(int a, int b) {
     return dum;
 }
 
-int func(int n, int A[], bool *r) {
+int func(int n, int A[]) {
 
     num_calls++;
+    curr_cut_index = n;
 
     if(n == 0) {
+        f_table[n]->is_set = true;
+        f_table[n]->val = 0;
         return 0;
-    }
-    if(n == 1) {
-        return A[0];
     }
 
     int val = A[n-1];
-    curr_cut_index = n;
+
+    if(n == 1) {
+        f_table[n]->is_set = true;
+        f_table[n]->val = val;
+        return A[0];
+    }
 
     if(n > 1) {
         for(int i = 1; i <= n - 1; ++i) {
-            int dum1, dum2;
-            if(f_table[i]->is_set == true) {
-                dum1 = f_table[i]->val;
-            }
-            else {
-                dum1 = func(i, A, r);
-            }
-            if(f_table[n-i]->is_set == true) {
-                dum2 = f_table[n-i]->val;
-            }
-            else {
-                dum2 = func(n-i, A, r);
-            }
+            if(i <= (n - i)) {
+                int dum1, dum2;
+                if(f_table[i]->is_set == true) {
+                    dum1 = f_table[i]->val;
+                }
+                else {
+                    dum1 = func(i, A);
+                }
+                if(f_table[n-i]->is_set == true) {
+                    dum2 = f_table[n-i]->val;
+                }
+                else {
+                    dum2 = func(n-i, A);
+                }
 
-            int dum = max(dum1 + dum2, A[n-1]);
+                int dum = max(dum1 + dum2, A[n-1]);
 
-            if(val < dum) {
-                val = dum;
-                curr_cut_index = i;
+                if(val < dum) {
+                    val = dum;
+                    curr_cut_index = i;
+                }
             }
         }
     }
@@ -80,7 +87,7 @@ void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
     int NN = n;
 
     while(NN > 0) {
-        (void) func(NN, A, r);
+        (void) func(NN, A);
         r[curr_cut_index] = true;
         cut_counter[curr_cut_index]++;
         NN = NN - curr_cut_index;
@@ -89,7 +96,7 @@ void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
     //Check to see if optimal cut can be cut up further
     for(int i = 0; i < n + 1; ++i) {
         if(r[i] == true) {
-            int max_rev_loc = func(i, A, r);
+            int max_rev_loc = func(i, A);
             if(max_rev_loc != A[i-1]) {
                 printf("error, cut not optimal\n");
             }
@@ -99,7 +106,7 @@ void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
 
 int main(int argc, char* argv[]) {
 
-    int N = 25; //Total length of the rod
+    int N = 50; //Total length of the rod
     int *A = new int[N]; //Cost array for the rod
 
     int *cut_counter = new int[N+1];
@@ -107,7 +114,7 @@ int main(int argc, char* argv[]) {
 
     //Initialize cost array with random numbers
     for(int i = 0; i < N; ++i) {
-        A[i] = rand() % 20;
+        A[i] = rand() % 4 + (5*i)/2;
     }
 
     //Initialize rod cutting tracker and memo table
@@ -123,11 +130,10 @@ int main(int argc, char* argv[]) {
     }
 
     //Compute omptimum revenue
-    int rev = func(N, A, rod_cut_at);
+    int rev = func(N, A);
 
     //Get optimum cut
     extract_optimum_cut(N, A, rod_cut_at, cut_counter);
-
 
     //Print results
     printf("total length of rod n: %d\n", N);
