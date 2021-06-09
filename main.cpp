@@ -85,7 +85,7 @@ int max_rev(int n, int A[]) {
 
 void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
 
-	(void) max_rev(n, A);
+    (void) max_rev(n, A);
 
     int NN = n;
 
