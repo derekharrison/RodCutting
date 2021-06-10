@@ -15,9 +15,12 @@ typedef struct table_element {
     int val;
 } t_elem;
 
-t_elem **f_table;
+typedef struct optimum_cut_info {
+    int curr_cut_index;
+    int max_rev;
+} opt_cut_info;
+
 int num_calls = 0;
-int curr_cut_index;
 
 int max(int a, int b) {
     int dum;
@@ -31,10 +34,9 @@ int max(int a, int b) {
     return dum;
 }
 
-int max_rev(int n, int A[]) {
+int fill_memo_table(int n, int A[], t_elem **f_table) {
 
     num_calls++;
-    curr_cut_index = n;
 
     if(n == 0) {
         f_table[n]->is_set = true;
@@ -58,20 +60,19 @@ int max_rev(int n, int A[]) {
                     dum1 = f_table[i]->val;
                 }
                 else {
-                    dum1 = max_rev(i, A);
+                    dum1 = fill_memo_table(i, A, f_table);
                 }
                 if(f_table[n-i]->is_set == true) {
                     dum2 = f_table[n-i]->val;
                 }
                 else {
-                    dum2 = max_rev(n-i, A);
+                    dum2 = fill_memo_table(n-i, A, f_table);
                 }
 
                 int dum = max(dum1 + dum2, A[n-1]);
 
                 if(val < dum) {
                     val = dum;
-                    curr_cut_index = i;
                 }
             }
         }
@@ -83,14 +84,75 @@ int max_rev(int n, int A[]) {
     return val;
 }
 
-void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
+opt_cut_info get_optimum_cut(int n, int A[], t_elem **f_table) {
 
-    (void) max_rev(n, A);
+	int curr_cut_index = n;
+
+    if(n == 0) {
+        return {0, 0};
+    }
+
+    int val = A[n-1];
+
+    if(n == 1) {
+        return {curr_cut_index, val};
+    }
+
+    if(n > 1) {
+        for(int i = 1; i <= n - 1; ++i) {
+            if(i <= (n - i)) {
+                int dum1, dum2;
+                if(f_table[i]->is_set != true) {
+                    printf("something went wrong, table element not set\n");
+                }
+
+                dum1 = f_table[i]->val;
+                dum2 = f_table[n-i]->val;
+
+                int dum = max(dum1 + dum2, A[n-1]);
+
+                if(val < dum) {
+                    val = dum;
+                    curr_cut_index = i;
+                }
+            }
+        }
+    }
+
+    opt_cut_info cut_info = {curr_cut_index, val};
+
+    return cut_info;
+}
+
+void delete_memo_table(t_elem **f_table, int n) {
+
+	for(int i = 0; i < n + 1; ++i) {
+		delete f_table[i];
+	}
+
+	delete [] f_table;
+}
+
+int get_optimum_solution(int n, int A[], bool *r, int *cut_counter) {
+
+    //Initialize rod cutting tracker and memo table
+    t_elem **f_table = new t_elem*[n+1];
+
+    for(int i = 0; i < n + 1; ++i) {
+        r[i] = false;
+        f_table[i] = new t_elem;
+        f_table[i]->val = 0;
+        f_table[i]->is_set = false;
+        cut_counter[i] = 0;
+    }
+
+    (void) fill_memo_table(n, A, f_table);
 
     int NN = n;
 
     while(NN > 0) {
-        (void) max_rev(NN, A);
+        opt_cut_info cut_info = get_optimum_cut(NN, A, f_table);
+        int curr_cut_index = cut_info.curr_cut_index;
         r[curr_cut_index] = true;
         cut_counter[curr_cut_index]++;
         NN = NN - curr_cut_index;
@@ -99,21 +161,29 @@ void extract_optimum_cut(int n, int A[], bool *r, int *cut_counter) {
     //Check to see if optimal cut can be cut up further
     for(int i = 0; i < n + 1; ++i) {
         if(r[i] == true) {
-            int max_rev_loc = max_rev(i, A);
+            opt_cut_info cut_info = get_optimum_cut(i, A, f_table);
+            int max_rev_loc = cut_info.max_rev;
             if(max_rev_loc != A[i-1]) {
                 printf("error, cut not optimal\n");
             }
         }
     }
+
+    int max_rev = get_optimum_cut(n, A, f_table).max_rev;
+
+    delete_memo_table(f_table, n);
+
+    return max_rev;
 }
 
 int main(int argc, char* argv[]) {
 
-    int N = 50; //Total length of the rod
+    int N = 100; //Total length of the rod
     int *A = new int[N]; //Cost array for the rod
 
+    //Arrays to store solution
+    bool *rod_cut_at = new bool[N+1];
     int *cut_counter = new int[N+1];
-    curr_cut_index = N;
 
     srand(time(NULL));
 
@@ -122,27 +192,12 @@ int main(int argc, char* argv[]) {
         A[i] = rand() % 4 + (5*i)/2;
     }
 
-    //Initialize rod cutting tracker and memo table
-    bool *rod_cut_at = new bool[N+1];
-    f_table = new t_elem*[N+1];
-
-    for(int i = 0; i < N + 1; ++i) {
-        rod_cut_at[i] = false;
-        f_table[i] = new t_elem;
-        f_table[i]->val = 0;
-        f_table[i]->is_set = false;
-        cut_counter[i] = 0;
-    }
-
-    //Compute omptimum revenue
-    int rev = max_rev(N, A);
-
-    //Get optimum cut
-    extract_optimum_cut(N, A, rod_cut_at, cut_counter);
+    //Get optimum solution
+    int max_rev = get_optimum_solution(N, A, rod_cut_at, cut_counter);
 
     //Print results
     printf("total length of rod n: %d\n", N);
-    printf("total revenue: %d\n", rev);
+    printf("total revenue: %d\n", max_rev);
     for(int i = 0; i < N + 1; ++i) {
         if(rod_cut_at[i] == true) {
             printf("rod cut at %i a total of %i times\n", i, cut_counter[i]);
