@@ -86,7 +86,7 @@ int fill_memo_table(int n, int A[], t_elem **f_table) {
 
 opt_cut_info get_optimum_cut(int n, int A[], t_elem **f_table) {
 
-	int curr_cut_index = n;
+    int curr_cut_index = n;
 
     if(n == 0) {
         return {0, 0};
@@ -126,11 +126,11 @@ opt_cut_info get_optimum_cut(int n, int A[], t_elem **f_table) {
 
 void delete_memo_table(t_elem **f_table, int n) {
 
-	for(int i = 0; i < n + 1; ++i) {
-		delete f_table[i];
-	}
+    for(int i = 0; i < n + 1; ++i) {
+        delete f_table[i];
+    }
 
-	delete [] f_table;
+    delete [] f_table;
 }
 
 int get_optimum_solution(int n, int A[], bool *r, int *cut_counter) {
