@@ -56,31 +56,21 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
         return {1, A[0]};
     }
 
-    if(n > 1) {
-        for(int i = 1; i <= n - 1; ++i) {
-            if(i <= (n - i)) {
-                opt_cut_info dum1, dum2;
-                if(f_table[i]->is_set == true) {
-                    dum1 = f_table[i]->optimum_cut_info;
-                }
-                else {
-                    dum1 = cut_rod(i, A, f_table);
-                }
-                if(f_table[n-i]->is_set == true) {
-                    dum2 = f_table[n-i]->optimum_cut_info;
-                }
-                else {
-                    dum2 = cut_rod(n-i, A, f_table);
-                }
+    for(int i = 1; i <= n - 1; ++i) {
+        if(i <= (n - i)) {
+            opt_cut_info dum1, dum2;
+            if(f_table[i]->is_set) { dum1 = f_table[i]->optimum_cut_info; }
+            else { dum1 = cut_rod(i, A, f_table); }
+            if(f_table[n-i]->is_set) { dum2 = f_table[n-i]->optimum_cut_info; }
+            else { dum2 = cut_rod(n-i, A, f_table); }
 
-                int dum_int1 = dum1.max_rev;
-                int dum_int2 = dum2.max_rev;
-                int dum = max(dum_int1 + dum_int2, A[n-1]);
+            int dum_int1 = dum1.max_rev;
+            int dum_int2 = dum2.max_rev;
+            int dum = max(dum_int1 + dum_int2, A[n-1]);
 
-                if(val < dum) {
-                    val = dum;
-                    curr_cut_index = i;
-                }
+            if(val < dum) {
+                val = dum;
+                curr_cut_index = i;
             }
         }
     }
