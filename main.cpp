@@ -24,12 +24,8 @@ int num_calls = 0;
 
 int max(int a, int b) {
     int dum;
-    if(a < b) {
-        dum = b;
-    }
-    else {
-        dum = a;
-    }
+    if(a < b) { dum = b; }
+    else { dum = a; }
 
     return dum;
 }
