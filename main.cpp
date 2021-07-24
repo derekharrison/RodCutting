@@ -106,6 +106,7 @@ int get_optimum_solution(int n, int A[], bool *r, int *cut_counter) {
 
     int NN = n;
 
+    //Cut rod
     while(NN > 0) {
         opt_cut_info cut_info = cut_rod(NN, A, f_table);
         int curr_cut_index = cut_info.curr_cut_index;
@@ -114,7 +115,7 @@ int get_optimum_solution(int n, int A[], bool *r, int *cut_counter) {
         NN = NN - curr_cut_index;
     }
 
-    //Check to see if optimal cut can be cut up further
+    //Check to see if cut is optimal
     for(int i = 0; i < n + 1; ++i) {
         if(r[i] == true) {
             opt_cut_info cut_info = cut_rod(i, A, f_table);
@@ -125,7 +126,8 @@ int get_optimum_solution(int n, int A[], bool *r, int *cut_counter) {
         }
     }
 
-    int max_rev = cut_rod(n, A, f_table).max_rev;
+    //Get max revenue from memo table
+    int max_rev = f_table[n]->optimum_cut_info.max_rev;
 
     delete_memo_table(f_table, n);
 
