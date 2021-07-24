@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
         A[i] = rand() % 4 + (5*i)/2;
     }
 
-    //Get optimum solution
+    //Get maximum revenue
     int max_rev = get_optimum_solution(N, A, rod_cut_at, cut_counter);
 
     //Print results
