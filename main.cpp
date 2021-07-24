@@ -143,9 +143,8 @@ int main(int argc, char* argv[]) {
     bool *rod_cut_at = new bool[N+1];
     int *cut_counter = new int[N+1];
 
-    srand(time(NULL));
-
     //Initialize cost array with random numbers
+    srand(time(NULL));
     for(int i = 0; i < N; ++i) {
         A[i] = rand() % 4 + (5*i)/2;
     }
