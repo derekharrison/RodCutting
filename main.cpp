@@ -16,7 +16,7 @@ typedef struct optimum_cut_info {
 } opt_cut_info;
 
 typedef struct table_element {
-    bool is_set = false;
+    bool is_set;
     opt_cut_info optimum_cut_info;
 } t_elem;
 
@@ -36,20 +36,21 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
 
     int curr_cut_index = n;
     int val = A[n-1];
-    opt_cut_info optimim_cut_info = {curr_cut_index, val};
 
     if(n == 0) {
         f_table[n]->is_set = true;
-        f_table[n]->optimum_cut_info = {0, 0};
+        f_table[n]->optimum_cut_info.curr_cut_index = 0;
+        f_table[n]->optimum_cut_info.max_rev = 0;
 
-        return {0, 0};
+        return f_table[n]->optimum_cut_info;
     }
 
     if(n == 1) {
         f_table[n]->is_set = true;
-        f_table[n]->optimum_cut_info = {1, A[0]};
+        f_table[n]->optimum_cut_info.curr_cut_index = 1;
+        f_table[n]->optimum_cut_info.max_rev = A[0];
 
-        return {1, A[0]};
+        return f_table[n]->optimum_cut_info;
     }
 
     for(int i = 1; i <= n - 1; ++i) {
@@ -72,11 +73,10 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
     }
 
     f_table[n]->is_set = true;
-    f_table[n]->optimum_cut_info = {curr_cut_index, val};
+    f_table[n]->optimum_cut_info.curr_cut_index = curr_cut_index;
+    f_table[n]->optimum_cut_info.max_rev = val;
 
-    optimim_cut_info = {curr_cut_index, val};
-
-    return optimim_cut_info;
+    return f_table[n]->optimum_cut_info;
 }
 
 void delete_memo_table(t_elem **f_table, int n) {
