@@ -11,7 +11,7 @@
 #include <time.h>
 
 typedef struct optimum_cut_info {
-    int curr_cut_index;
+    int cut_index;
     int max_rev;
 } opt_cut_info;
 
@@ -34,12 +34,12 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
 
     num_calls++;
 
-    int curr_cut_index = n;
+    int cut_index = n;
     int val = A[n-1];
 
     if(n == 0) {
         f_table[n]->is_set = true;
-        f_table[n]->optimum_cut_info.curr_cut_index = 0;
+        f_table[n]->optimum_cut_info.cut_index = 0;
         f_table[n]->optimum_cut_info.max_rev = 0;
 
         return f_table[n]->optimum_cut_info;
@@ -47,7 +47,7 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
 
     if(n == 1) {
         f_table[n]->is_set = true;
-        f_table[n]->optimum_cut_info.curr_cut_index = 1;
+        f_table[n]->optimum_cut_info.cut_index = 1;
         f_table[n]->optimum_cut_info.max_rev = A[0];
 
         return f_table[n]->optimum_cut_info;
@@ -67,13 +67,13 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
 
             if(val < dum) {
                 val = dum;
-                curr_cut_index = i;
+                cut_index = i;
             }
         }
     }
 
     f_table[n]->is_set = true;
-    f_table[n]->optimum_cut_info.curr_cut_index = curr_cut_index;
+    f_table[n]->optimum_cut_info.cut_index = cut_index;
     f_table[n]->optimum_cut_info.max_rev = val;
 
     return f_table[n]->optimum_cut_info;
@@ -105,10 +105,10 @@ int get_optimum_solution(int n, int A[], bool *r, int *cut_counter) {
     //Cut rod
     while(NN > 0) {
         opt_cut_info cut_info = cut_rod(NN, A, f_table);
-        int curr_cut_index = cut_info.curr_cut_index;
-        r[curr_cut_index] = true;
-        cut_counter[curr_cut_index]++;
-        NN = NN - curr_cut_index;
+        int cut_index = cut_info.cut_index;
+        r[cut_index] = true;
+        cut_counter[cut_index]++;
+        NN = NN - cut_index;
     }
 
     //Check to see if cut is optimal
