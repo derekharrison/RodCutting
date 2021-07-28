@@ -34,9 +34,6 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
 
     num_calls++;
 
-    int cut_index = n;
-    int val = A[n-1];
-
     if(n == 0) {
         f_table[n]->is_set = true;
         f_table[n]->optimum_cut_info.cut_index = 0;
@@ -52,6 +49,9 @@ opt_cut_info cut_rod(int n, int A[], t_elem **f_table) {
 
         return f_table[n]->optimum_cut_info;
     }
+
+    int cut_index = n;
+    int val = A[n-1];
 
     for(int i = 1; i <= n - 1; ++i) {
         if(i <= (n - i)) {
